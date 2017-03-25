@@ -1,95 +1,82 @@
+import  MySQLdb
+import sys
+
 negative_list = []
 positive_list = []
+
 with open("negatives.txt", "r") as negatives:
     for line in negatives:
-        line = line.replace(' ', '').strip('\n')
+        line = line.replace(' ', '').strip('\n\r')
         negative_list.append(line)
 
 with open("positives.txt", "r") as positives:
     for line in positives:
-        line = line.replace(' ', '').strip('\n')
+        line = line.replace(' ', '').strip('\n\r')
         positive_list.append(line)
 
+your_responses = []
+friend_responses = []
 
-def start_conversation(friend_name):
-    your_responses = []
-    friend_responses = []
+punctuations = ['.', '?', '!', ':', ',', ';', '(', ')', '[', ']', '/', ' ']
 
-    your_response = ""
-    friend_response = ""
+your_words = []
+friend_words = []
 
-    print("Conversation started")
+connection = MySQLdb.connect(host="localhost", port=3306, user="root", passwd="platinum5*", db="huhacks")
+cursor = connection.cursor()
 
-    while ("bye" not in your_response.split(' ')) and ("bye" not in friend_response.split(' ')):
+cursor.execute("select message from conversations where fromnumber='123'")
+your_data = cursor.fetchone()
 
-        punctuations = ['.', '?', '!', ':', ',', ';', '(', ')', '[', ']', '/']
+while your_data is not None:
+    your_words += your_data[0].split(' ')
+    your_data = cursor.fetchone()
+for i in range(len(your_words)):
+    your_words[i] = your_words[i].lower()
+    your_words[i] = "".join([j for j in your_words[i] if j not in punctuations])
 
-        # Allows you to enter your msg to your friend.
-        print("ME:", end=' ')
-        your_response = input()
-        # print(your_response)         # FIX THIS
-        your_response = your_response.lower()
-        your_response = "".join([i for i in your_response if i not in punctuations])
-        your_words = your_response.split(' ')
-        your_responses += your_words            # Stores your response in a list.
+#print(your_words)
+#print(negative_list) 
+#print(positive_list) 
 
-        # Allows your friend to respond.
-        print(friend_name, end='')
-        print(":", end=' ')
-        friend_response = input()
-        # print(friend_response)
-        friend_response = friend_response.lower()
-        friend_response = "".join([i for i in friend_response if i not in punctuations])
-        friend_words = friend_response.split(' ')
-        friend_responses += friend_words      # Stores the friend's response in list.
-
-    your_score = 5
-    friend_score = 5
-
-    for word in your_responses:
-        for response in negative_list:
-            if word == response:
-                your_score -= 1
-                break
-        for response in positive_list:
-            if word == response:
-                your_score += 1
-                break
-
-    for word in friend_responses:
-        for response in negative_list:
-            if word == response:
-                friend_score -= 1
-                break
-        for response in positive_list:
-            if word == response:
-                friend_score += 1
-                break
-
-    print("Your Score: ", your_score)
-    print("Friend's Score: ", friend_score)
+cursor.execute("select message from conversations where fromnumber = '456' ")
+friend_data = cursor.fetchone()
+while friend_data is not None:
+    friend_words += friend_data[0].split(' ')
+    friend_data = cursor.fetchone()
+for i in range(len(friend_words)):
+    friend_words[i] = friend_words[i].lower()
+    friend_words[i] = "".join([j for j in friend_words[i] if j not in punctuations])
 
 
-def message(name):
-    start_conversation(name)
+print(friend_words)
 
-friends = {1: "Delaney", 2: "Jason", 3: "Elijah"}
+your_score = 50
+friend_score = 50
 
-print("Who do you want to message?")
+for word in your_words:
+    for response in negative_list:
+        if word == response:
+            your_score -= 1
+            break
+    for response in positive_list:
+        if word == response and your_score < 100:
+            your_score += 1
+            break
 
-x = 1
-for friend in friends:
-    print(x, end='')
-    print(". ", end='')
-    print(friends[x])
-    x += 1
+for word in friend_words:
+    for response in negative_list:
+        if word == response:
+            friend_score -= 1
+            break
+    for response in positive_list:
+        if word == response and friend_score < 100:
+            friend_score += 1
+            break
 
-y = int(input())
 
-message(friends[y])
-
-#
-
+print("Your score:",your_score)
+print("Your friend's score:",friend_score)
 
 
 
