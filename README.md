@@ -38,7 +38,7 @@ README can be reached at:
 E-mails:	kaleshsingh96@gmail.com
 		salaam.olufemi@gmail.com
 		shamara.smith@bison.howard.edu
-		afua.ankomah@gmail.com
+		hi@aoa4eva.me
 		johan.1.green@gmail.com
 
 
